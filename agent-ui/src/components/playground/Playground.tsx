@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { AgentSelector } from '@/components/playground/Sidebar/AgentSelector'
 import { TeamSelector } from '@/components/playground/Sidebar/TeamSelector'
@@ -15,15 +15,15 @@ import { getProviderIcon } from '@/lib/modelProvider'
 
 type PlaygroundTab = 'agents' | 'teams' | 'workflows'
 
-const ModelDisplay = ({ model }: { model: string }) => (
-  <div className="flex h-9 w-full items-center gap-3 rounded-xl border border-primary/15 bg-accent p-3 text-xs font-medium uppercase text-muted">
-    {(() => {
-      const icon = getProviderIcon(model)
-      return icon ? <Icon type={icon} className="shrink-0" size="xs" /> : null
-    })()}
-    {model}
-  </div>
-)
+const ModelDisplay = ({ model }: { model: string }) => {
+  const icon = getProviderIcon(model)
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-accent/50 px-3 py-2">
+      {icon && <Icon type={icon} size="xs" />}
+      <span className="text-xs font-medium text-muted">{model}</span>
+    </div>
+  )
+}
 
 export function Playground() {
   const {
@@ -32,16 +32,84 @@ export function Playground() {
     workflows,
     selectedModel,
     isEndpointLoading,
-    isEndpointActive
+    isEndpointActive,
+    setMessages,
+    setSessionsData
   } = usePlaygroundStore()
   const { initializePlayground } = useChatActions()
   const [activeTab, setActiveTab] = useState<PlaygroundTab>('agents')
-  const [agentId] = useQueryState('agent')
-  const [teamId] = useQueryState('team')
-  const [workflowId] = useQueryState('workflow')
+  const [agentId, setAgentId] = useQueryState('agent')
+  const [teamId, setTeamId] = useQueryState('team')
+  const [workflowId, setWorkflowId] = useQueryState('workflow')
+  const [, setSessionId] = useQueryState('session')
+  const userClickedTab = useRef(false)
+
+  // URL 파라미터에 따라 적절한 탭 선택
+  useEffect(() => {
+    // 사용자가 직접 탭을 클릭한 경우는 무시 (약간의 지연을 두고 리셋)
+    if (userClickedTab.current) {
+      setTimeout(() => {
+        userClickedTab.current = false
+      }, 100)
+      return
+    }
+
+    // 복수 파라미터가 있는 경우 우선순위에 따라 하나만 남기고 정리
+    if (teamId && agentId) {
+      setActiveTab('teams')
+      setAgentId(null)
+      return
+    }
+    if (workflowId && (agentId || teamId)) {
+      setActiveTab('workflows')
+      if (agentId) setAgentId(null)
+      if (teamId) setTeamId(null)
+      return
+    }
+
+    // 단일 파라미터인 경우 해당 탭 선택
+    if (teamId && !agentId && !workflowId) {
+      setActiveTab('teams')
+    } else if (workflowId && !agentId && !teamId) {
+      setActiveTab('workflows')
+    } else if (agentId && !teamId && !workflowId) {
+      setActiveTab('agents')
+    }
+  }, [agentId, teamId, workflowId])
 
   const handleRefresh = async () => {
     await initializePlayground()
+  }
+
+  const handleTabChange = (tab: PlaygroundTab) => {
+    // 사용자가 직접 클릭했음을 표시
+    userClickedTab.current = true
+    
+    // 탭 즉시 설정
+    setActiveTab(tab)
+    
+    // 메시지/세션 초기화
+    setMessages([])
+    setSessionsData([])
+    setSessionId(null)
+    
+    // 다른 파라미터들 batch로 정리 (상태 변경을 한번에 처리)
+    requestAnimationFrame(() => {
+      switch (tab) {
+        case 'agents':
+          if (teamId) setTeamId(null)
+          if (workflowId) setWorkflowId(null)
+          break
+        case 'teams':
+          if (agentId) setAgentId(null)
+          if (workflowId) setWorkflowId(null)
+          break
+        case 'workflows':
+          if (agentId) setAgentId(null)
+          if (teamId) setTeamId(null)
+          break
+      }
+    })
   }
 
   const renderSelector = () => {
@@ -115,7 +183,7 @@ export function Playground() {
         {(['agents', 'teams', 'workflows'] as PlaygroundTab[]).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => handleTabChange(tab)}
             className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium uppercase transition-colors ${
               activeTab === tab
                 ? 'bg-primary text-background'

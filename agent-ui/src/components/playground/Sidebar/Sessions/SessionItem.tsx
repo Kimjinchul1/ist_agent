@@ -22,6 +22,7 @@ const SessionItem = ({
   onSessionClick
 }: SessionItemProps) => {
   const [agentId] = useQueryState('agent')
+  const [teamId] = useQueryState('team')
   const { getSession } = useSessionLoader()
   const [, setSessionId] = useQueryState('session')
   const { selectedEndpoint, sessionsData, setSessionsData } =
@@ -30,22 +31,33 @@ const SessionItem = ({
   const { clearChat } = useChatActions()
 
   const handleGetSession = async () => {
-    if (agentId) {
+    if (agentId || teamId) {
       onSessionClick()
-      await getSession(session_id, agentId)
+      await getSession(session_id, agentId || '', teamId || undefined)
       setSessionId(session_id)
     }
   }
 
   const handleDeleteSession = async () => {
-    if (agentId) {
+    if (agentId || teamId) {
       try {
-        const response = await deletePlaygroundSessionAPI(
-          selectedEndpoint,
-          agentId,
-          session_id
-        )
-        if (response.status === 200 && sessionsData) {
+        let response
+        if (teamId) {
+          const { deletePlaygroundTeamSessionAPI } = await import('@/api/playground')
+          response = await deletePlaygroundTeamSessionAPI(
+            selectedEndpoint,
+            teamId,
+            session_id
+          )
+        } else if (agentId) {
+          response = await deletePlaygroundSessionAPI(
+            selectedEndpoint,
+            agentId,
+            session_id
+          )
+        }
+        
+        if (response?.status === 200 && sessionsData) {
           setSessionsData(
             sessionsData.filter((session) => session.session_id !== session_id)
           )

@@ -42,10 +42,11 @@ export function AgentSelector() {
   }, [agentId, agents, setSelectedModel])
 
   const handleOnValueChange = (value: string) => {
-    const selectedAgent = agents.find((agent) => agent.value === value)
+    const newAgent = value === agentId ? '' : value
+    const selectedAgent = agents.find((agent) => agent.value === newAgent)
     setSelectedModel(selectedAgent?.model.provider || '')
     setHasStorage(!!selectedAgent?.storage)
-    setAgentId(value)
+    setAgentId(newAgent)
     setMessages([])
     setSessionId(null)
     if (selectedAgent?.model.provider) {

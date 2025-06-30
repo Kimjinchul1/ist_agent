@@ -27,5 +27,21 @@ export const APIRoutes = {
     agentId: string,
     sessionId: string
   ) =>
-    `${PlaygroundApiUrl}/v1/playground/agents/${agentId}/sessions/${sessionId}`
+    `${PlaygroundApiUrl}/v1/playground/agents/${agentId}/sessions/${sessionId}`,
+  
+  // Team 세션 관련 엔드포인트 추가
+  GetPlaygroundTeamSessions: (PlaygroundApiUrl: string, teamId: string) =>
+    `${PlaygroundApiUrl}/v1/playground/teams/${teamId}/sessions`,
+  GetPlaygroundTeamSession: (
+    PlaygroundApiUrl: string,
+    teamId: string,
+    sessionId: string
+  ) =>
+    `${PlaygroundApiUrl}/v1/playground/teams/${teamId}/sessions/${sessionId}`,
+  DeletePlaygroundTeamSession: (
+    PlaygroundApiUrl: string,
+    teamId: string,
+    sessionId: string
+  ) =>
+    `${PlaygroundApiUrl}/v1/playground/teams/${teamId}/sessions/${sessionId}`
 }

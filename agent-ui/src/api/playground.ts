@@ -123,3 +123,56 @@ export const deletePlaygroundSessionAPI = async (
   )
   return response
 }
+
+// Team 세션 관련 API 함수들 추가
+export const getAllPlaygroundTeamSessionsAPI = async (
+  base: string,
+  teamId: string
+): Promise<SessionEntry[]> => {
+  try {
+    const response = await fetch(
+      APIRoutes.GetPlaygroundTeamSessions(base, teamId),
+      {
+        method: 'GET'
+      }
+    )
+    if (!response.ok) {
+      if (response.status === 404) {
+        // Return empty array when storage is not enabled
+        return []
+      }
+      throw new Error(`Failed to fetch team sessions: ${response.statusText}`)
+    }
+    return response.json()
+  } catch {
+    return []
+  }
+}
+
+export const getPlaygroundTeamSessionAPI = async (
+  base: string,
+  teamId: string,
+  sessionId: string
+) => {
+  const response = await fetch(
+    APIRoutes.GetPlaygroundTeamSession(base, teamId, sessionId),
+    {
+      method: 'GET'
+    }
+  )
+  return response.json()
+}
+
+export const deletePlaygroundTeamSessionAPI = async (
+  base: string,
+  teamId: string,
+  sessionId: string
+) => {
+  const response = await fetch(
+    APIRoutes.DeletePlaygroundTeamSession(base, teamId, sessionId),
+    {
+      method: 'DELETE'
+    }
+  )
+  return response
+}

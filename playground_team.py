@@ -13,7 +13,6 @@ agent_storage: str = "tmp/agents.db"
 
 web_agent = Agent(
     name="Web Agent",
-    agent_id="web_agent",
     model=OpenAIChat(id="gpt-4o"),
     tools=[DuckDuckGoTools()],
     instructions=["Always include sources"],
@@ -31,7 +30,6 @@ web_agent = Agent(
 
 finance_agent = Agent(
     name="Finance Agent",
-    agent_id="finance_agent",
     model=OpenAIChat(id="gpt-4o"),
     tools=[YFinanceTools(stock_price=True, analyst_recommendations=True, company_info=True, company_news=True)],
     instructions=["Always use tables to display data"],
@@ -57,7 +55,6 @@ finance_team = Team(
         "Coordinate between web search and financial analysis",
         "Use tables to display financial data",
         "Always include sources for information",
-        "Provide comprehensive analysis combining web research and financial data",
     ],
     markdown=True,
     show_members_responses=True,
@@ -80,4 +77,4 @@ playground = Playground(
 app = playground.get_app()
 
 if __name__ == "__main__":
-    playground.serve(app="playground_team:app", host="0.0.0.0", port=7777, reload=True)
+    playground.serve("playground_team:app", reload=True)

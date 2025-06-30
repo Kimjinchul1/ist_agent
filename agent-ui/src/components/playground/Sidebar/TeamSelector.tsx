@@ -42,10 +42,11 @@ export function TeamSelector() {
   }, [teamId, teams, setSelectedModel])
 
   const handleOnValueChange = (value: string) => {
-    const selectedTeam = teams.find((team) => team.team_id === value)
+    const newTeam = value === teamId ? '' : value
+    const selectedTeam = teams.find((team) => team.team_id === newTeam)
     setSelectedModel(selectedTeam?.model?.provider || '')
     setHasStorage(!!selectedTeam?.storage)
-    setTeamId(value)
+    setTeamId(newTeam)
     setMessages([])
     setSessionId(null)
     if (selectedTeam?.model?.provider) {

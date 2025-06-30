@@ -145,7 +145,7 @@ const useAIChatStreamHandler = () => {
             
             await streamResponse({
               apiUrl,
-              requestBody: JSON.stringify(requestBody),
+              requestBody: requestBody,
               headers: {
                 'Content-Type': 'application/json'
               },
@@ -211,7 +211,7 @@ const useAIChatStreamHandler = () => {
       let lastContent = ''
       let newSessionId = sessionId
       try {
-        if (!agentId && !teamId) return
+        if (!agentId && !teamId && !workflowId) return
         
         const apiUrl = getApiUrl()
 

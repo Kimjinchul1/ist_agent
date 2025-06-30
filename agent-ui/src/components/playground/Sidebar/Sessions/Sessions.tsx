@@ -52,6 +52,10 @@ const Sessions = () => {
     parse: (value) => value || undefined,
     history: 'push'
   })
+  const [teamId] = useQueryState('team', {
+    parse: (value) => value || undefined,
+    history: 'push'
+  })
   const [sessionId] = useQueryState('session')
   const {
     selectedEndpoint,
@@ -93,24 +97,35 @@ const Sessions = () => {
 
   // Load a session on render if a session id exists in url
   useEffect(() => {
-    if (sessionId && agentId && selectedEndpoint && hydrated) {
-      getSession(sessionId, agentId)
+    if (sessionId && selectedEndpoint && hydrated) {
+      // teamId가 있으면 team 세션, agentId가 있으면 agent 세션
+      if (teamId) {
+        getSession(sessionId, '', teamId)
+      } else if (agentId) {
+        getSession(sessionId, agentId, undefined)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated])
 
   useEffect(() => {
-    if (!selectedEndpoint || !agentId || !hasStorage) {
+    if (!selectedEndpoint || !hasStorage) {
       setSessionsData(() => null)
       return
     }
     if (!isEndpointLoading) {
       setSessionsData(() => null)
-      getSessions(agentId)
+      // teamId가 있으면 team 세션, agentId가 있으면 agent 세션
+      if (teamId) {
+        getSessions('', teamId)
+      } else if (agentId) {
+        getSessions(agentId, undefined)
+      }
     }
   }, [
     selectedEndpoint,
     agentId,
+    teamId,
     getSessions,
     isEndpointLoading,
     hasStorage,

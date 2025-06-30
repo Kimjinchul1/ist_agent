@@ -1,7 +1,9 @@
 import { useCallback } from 'react'
 import {
   getPlaygroundSessionAPI,
-  getAllPlaygroundSessionsAPI
+  getAllPlaygroundSessionsAPI,
+  getPlaygroundTeamSessionAPI,
+  getAllPlaygroundTeamSessionsAPI
 } from '@/api/playground'
 import { usePlaygroundStore } from '../store'
 import { toast } from 'sonner'
@@ -34,14 +36,22 @@ const useSessionLoader = () => {
   const setSessionsData = usePlaygroundStore((state) => state.setSessionsData)
 
   const getSessions = useCallback(
-    async (agentId: string) => {
-      if (!agentId || !selectedEndpoint) return
+    async (agentId: string, teamId?: string) => {
+      if ((!agentId && !teamId) || !selectedEndpoint) return
       try {
         setIsSessionsLoading(true)
-        const sessions = await getAllPlaygroundSessionsAPI(
-          selectedEndpoint,
-          agentId
-        )
+        let sessions
+        if (teamId) {
+          sessions = await getAllPlaygroundTeamSessionsAPI(
+            selectedEndpoint,
+            teamId
+          )
+        } else {
+          sessions = await getAllPlaygroundSessionsAPI(
+            selectedEndpoint,
+            agentId
+          )
+        }
         setSessionsData(sessions)
       } catch {
         toast.error('Error loading sessions')
@@ -53,17 +63,26 @@ const useSessionLoader = () => {
   )
 
   const getSession = useCallback(
-    async (sessionId: string, agentId: string) => {
-      if (!sessionId || !agentId || !selectedEndpoint) {
+    async (sessionId: string, agentId: string, teamId?: string) => {
+      if (!sessionId || (!agentId && !teamId) || !selectedEndpoint) {
         return null
       }
 
       try {
-        const response = (await getPlaygroundSessionAPI(
-          selectedEndpoint,
-          agentId,
-          sessionId
-        )) as SessionResponse
+        let response
+        if (teamId) {
+          response = (await getPlaygroundTeamSessionAPI(
+            selectedEndpoint,
+            teamId,
+            sessionId
+          )) as SessionResponse
+        } else {
+          response = (await getPlaygroundSessionAPI(
+            selectedEndpoint,
+            agentId,
+            sessionId
+          )) as SessionResponse
+        }
 
         if (response && response.memory) {
           const sessionHistory = response.runs

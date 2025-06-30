@@ -28,8 +28,6 @@ const useChatActions = () => {
   const setWorkflows = usePlaygroundStore((state) => state.setWorkflows)
   const setSelectedModel = usePlaygroundStore((state) => state.setSelectedModel)
   const [agentId, setAgentId] = useQueryState('agent')
-  const [teamId] = useQueryState('team')
-  const [workflowId] = useQueryState('workflow')
 
   const getStatus = useCallback(async () => {
     try {
@@ -111,7 +109,7 @@ const useChatActions = () => {
         teams = teamsData
         workflows = workflowsData
         
-        if (agents.length > 0 && !agentId && !teamId && !workflowId) {
+        if (agents.length > 0 && !agentId) {
           const firstAgent = agents[0]
           setAgentId(firstAgent.value)
           setSelectedModel(firstAgent.model.provider || '')
@@ -142,9 +140,7 @@ const useChatActions = () => {
     setWorkflows,
     setAgentId,
     setSelectedModel,
-    agentId,
-    teamId,
-    workflowId
+    agentId
   ])
 
   return {
