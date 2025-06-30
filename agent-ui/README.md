@@ -1,66 +1,61 @@
 # Agent UI
 
-A modern chat interface for AI agents built with Next.js, Tailwind CSS, and TypeScript. This template provides a ready-to-use UI for interacting with Agno agents.
-
-<img src="https://github.com/user-attachments/assets/7765fae5-a813-46cb-993b-904af9bc1672" alt="agent-ui" style="border-radius: 10px; width: 100%; max-width: 800px;" />
+A beautiful, open-source interface for interacting with AI agents, teams, and workflows.
 
 ## Features
 
-- 💬 **Modern Chat Interface**: Clean design with real-time streaming support
-- 🧩 **Tool Calls Support**: Visualizes agent tool calls and their results
-- 🧠 **Reasoning Steps**: Displays agent reasoning process (when available)
-- 📚 **References Support**: Show sources used by the agent
-- 🖼️ **Multi-modality Support**: Handles various content types including images, video, and audio
-- 🎨 **Customizable UI**: Built with Tailwind CSS for easy styling
-- 🧰 **Built with Modern Stack**: Next.js, TypeScript, shadcn/ui, Framer Motion, and more
+- **Agents**: Chat with individual AI agents
+- **Teams**: Interact with multi-agent teams for collaborative tasks
+- **Workflows**: Execute structured workflows for complex processes
+- **Beautiful UI**: Modern, responsive interface built with Next.js and TypeScript
+- **Real-time Streaming**: Live streaming of agent responses
+- **Session Management**: Persistent chat history and session management
+- **Local Storage**: All data stored locally, no external dependencies
 
-## Getting Started
-
-### Prerequisites
-
-Before setting up Agent UI, you may want to have an Agno Playground running. If you haven't set up the Agno Playground yet, follow the [official guide](https://agno.link/agent-ui#connect-to-local-agents) to run the Playground locally.
-
-### Installation
-
-### Automatic Installation (Recommended)
+## Quick Start
 
 ```bash
+# Create a new Agent UI project
 npx create-agent-ui@latest
-```
 
-### Manual Installation
-
-1. Clone the repository:
-
-```bash
+# Or clone and run manually
 git clone https://github.com/agno-agi/agent-ui.git
-cd agent-ui
+cd agent-ui && pnpm install && pnpm dev
 ```
 
-2. Install dependencies:
+The UI will connect to `localhost:7777` by default, matching the Agno Playground setup.
 
-```bash
-pnpm install
-```
+## Team and Workflow Support
 
-3. Start the development server:
+This Agent UI now supports the full Agno ecosystem:
 
-```bash
-pnpm dev
-```
+### Agents
+- Individual AI agents with specific capabilities
+- Direct chat interface
+- Tool calling and reasoning support
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Teams
+- Multi-agent collaboration
+- Coordinated responses from multiple agents
+- Team-based memory and context sharing
 
-## Connecting to an Agent Backend
+### Workflows
+- Structured, step-by-step processes
+- Automated task execution
+- Complex multi-step operations
 
-By default Agent UI connects to `http://localhost:7777`. You can easily change this by hovering over the endpoint URL and clicking the edit option.
+## Configuration
 
-The default endpoint works with the standard Agno Playground setup described in the [official documentation](https://agno.link/agent-ui#connect-to-local-agents).
+The UI automatically detects and displays available agents, teams, and workflows from your connected Agno endpoint. Simply:
 
-## Contributing
+1. Start your Agno playground server
+2. Launch the Agent UI
+3. Select your endpoint
+4. Choose between agents, teams, or workflows
 
-Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
+## Requirements
 
-## License
+- Node.js 18+
+- An Agno playground server running (typically on port 7777)
 
-This project is licensed under the [MIT License](./LICENSE).
+For more information, visit the [Agno documentation](https://docs.agno.com).

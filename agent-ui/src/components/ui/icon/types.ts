@@ -36,6 +36,9 @@ export type IconType =
   | 'plus-icon'
   | 'references'
   | 'trash'
+  | 'users'
+  | 'workflow'
+  | 'cloud-off'
 
 export interface IconProps {
   type: IconType

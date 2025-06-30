@@ -23,6 +23,8 @@ const useAIChatStreamHandler = () => {
   const setMessages = usePlaygroundStore((state) => state.setMessages)
   const { addMessage, focusChatInput } = useChatActions()
   const [agentId] = useQueryState('agent')
+  const [teamId] = useQueryState('team')
+  const [workflowId] = useQueryState('workflow')
   const [sessionId, setSessionId] = useQueryState('session')
   const selectedEndpoint = usePlaygroundStore((state) => state.selectedEndpoint)
   const setStreamingErrorMessage = usePlaygroundStore(
@@ -105,12 +107,75 @@ const useAIChatStreamHandler = () => {
     [processToolCall]
   )
 
+  const getApiUrl = useCallback(() => {
+    const endpointUrl = constructEndpointUrl(selectedEndpoint)
+    
+    if (agentId) {
+      return APIRoutes.AgentRun(endpointUrl).replace('{agent_id}', agentId)
+    }
+    if (teamId) {
+      return APIRoutes.TeamRun(endpointUrl).replace('{team_id}', teamId)
+    }
+    if (workflowId) {
+      return APIRoutes.WorkflowRun(endpointUrl).replace('{workflow_id}', workflowId)
+    }
+    
+    throw new Error('No agent, team, or workflow selected')
+  }, [selectedEndpoint, agentId, teamId, workflowId])
+
   const handleStreamResponse = useCallback(
     async (input: string | FormData) => {
       setIsStreaming(true)
 
       const formData = input instanceof FormData ? input : new FormData()
       if (typeof input === 'string') {
+        if (workflowId) {
+          // For workflows, send as JSON body instead of form data
+          const requestBody = {
+            input: input,
+            stream: true,
+            session_id: sessionId ?? ''
+          }
+          
+          let lastContent = ''
+          let newSessionId = sessionId
+          
+          try {
+            const apiUrl = getApiUrl()
+            
+            await streamResponse({
+              apiUrl,
+              requestBody: JSON.stringify(requestBody),
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              onChunk: (chunk: RunResponse) => {
+                // Handle workflow response chunks
+                // Similar logic to agent handling but adapted for workflow events
+                if (chunk.event === RunEvent.RunStarted) {
+                  newSessionId = chunk.session_id as string
+                  setSessionId(chunk.session_id as string)
+                }
+                // Add more workflow-specific event handling here
+              },
+              onError: (error) => {
+                updateMessagesWithErrorState()
+                setStreamingErrorMessage(error.message)
+              },
+              onComplete: () => {}
+            })
+          } catch (error) {
+            updateMessagesWithErrorState()
+            setStreamingErrorMessage(
+              error instanceof Error ? error.message : String(error)
+            )
+          } finally {
+            focusChatInput()
+            setIsStreaming(false)
+          }
+          return
+        }
+        
         formData.append('message', input)
       }
 
@@ -146,19 +211,15 @@ const useAIChatStreamHandler = () => {
       let lastContent = ''
       let newSessionId = sessionId
       try {
-        const endpointUrl = constructEndpointUrl(selectedEndpoint)
-
-        if (!agentId) return
-        const playgroundRunUrl = APIRoutes.AgentRun(endpointUrl).replace(
-          '{agent_id}',
-          agentId
-        )
+        if (!agentId && !teamId) return
+        
+        const apiUrl = getApiUrl()
 
         formData.append('stream', 'true')
         formData.append('session_id', sessionId ?? '')
 
         await streamResponse({
-          apiUrl: playgroundRunUrl,
+          apiUrl,
           requestBody: formData,
           onChunk: (chunk: RunResponse) => {
             if (
@@ -377,6 +438,9 @@ const useAIChatStreamHandler = () => {
       selectedEndpoint,
       streamResponse,
       agentId,
+      teamId,
+      workflowId,
+      getApiUrl,
       setStreamingErrorMessage,
       setIsStreaming,
       focusChatInput,

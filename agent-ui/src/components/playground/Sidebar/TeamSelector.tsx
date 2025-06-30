@@ -14,75 +14,75 @@ import Icon from '@/components/ui/icon'
 import { useEffect } from 'react'
 import useChatActions from '@/hooks/useChatActions'
 
-export function AgentSelector() {
-  const { agents, setMessages, setSelectedModel, setHasStorage } =
+export function TeamSelector() {
+  const { teams, setMessages, setSelectedModel, setHasStorage } =
     usePlaygroundStore()
   const { focusChatInput } = useChatActions()
-  const [agentId, setAgentId] = useQueryState('agent', {
+  const [teamId, setTeamId] = useQueryState('team', {
     parse: (value) => value || undefined,
     history: 'push'
   })
   const [, setSessionId] = useQueryState('session')
 
-  // Set the model when the component mounts if an agent is already selected
+  // Set the model when the component mounts if a team is already selected
   useEffect(() => {
-    if (agentId && agents.length > 0) {
-      const agent = agents.find((agent) => agent.value === agentId)
-      if (agent) {
-        setSelectedModel(agent.model.provider || '')
-        setHasStorage(!!agent.storage)
-        if (agent.model.provider) {
+    if (teamId && teams.length > 0) {
+      const team = teams.find((team) => team.team_id === teamId)
+      if (team) {
+        setSelectedModel(team.model?.provider || '')
+        setHasStorage(!!team.storage)
+        if (team.model?.provider) {
           focusChatInput()
         }
       } else {
-        setAgentId(agents[0].value)
+        setTeamId(teams[0].team_id)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [agentId, agents, setSelectedModel])
+  }, [teamId, teams, setSelectedModel])
 
   const handleOnValueChange = (value: string) => {
-    const selectedAgent = agents.find((agent) => agent.value === value)
-    setSelectedModel(selectedAgent?.model.provider || '')
-    setHasStorage(!!selectedAgent?.storage)
-    setAgentId(value)
+    const selectedTeam = teams.find((team) => team.team_id === value)
+    setSelectedModel(selectedTeam?.model?.provider || '')
+    setHasStorage(!!selectedTeam?.storage)
+    setTeamId(value)
     setMessages([])
     setSessionId(null)
-    if (selectedAgent?.model.provider) {
+    if (selectedTeam?.model?.provider) {
       focusChatInput()
     }
   }
 
   return (
     <Select
-      value={agentId || ''}
+      value={teamId || ''}
       onValueChange={(value) => handleOnValueChange(value)}
     >
       <SelectTrigger className="h-9 w-full rounded-xl border border-primary/15 bg-primaryAccent text-xs font-medium uppercase">
-        <SelectValue placeholder="Select Agent" />
+        <SelectValue placeholder="Select Team" />
       </SelectTrigger>
       <SelectContent className="border-none bg-primaryAccent font-dmmono shadow-lg">
-        {agents.map((agent, index) => (
+        {teams.map((team, index) => (
           <SelectItem
             className="cursor-pointer"
-            key={`${agent.value}-${index}`}
-            value={agent.value}
+            key={`${team.team_id}-${index}`}
+            value={team.team_id}
           >
             <div className="flex items-center gap-3 text-xs font-medium uppercase">
-              <Icon type={'agent'} size="xs" />
-              {agent.label}
+              <Icon type={'users'} size="xs" />
+              {team.name}
             </div>
           </SelectItem>
         ))}
-        {agents.length === 0 && (
+        {teams.length === 0 && (
           <SelectItem
-            value="no-agents"
+            value="no-teams"
             className="cursor-not-allowed select-none text-center"
           >
-            No agents found
+            No teams found
           </SelectItem>
         )}
       </SelectContent>
     </Select>
   )
-}
+} 

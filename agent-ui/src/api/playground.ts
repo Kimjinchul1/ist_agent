@@ -29,6 +29,42 @@ export const getPlaygroundAgentsAPI = async (
   }
 }
 
+export const getPlaygroundTeamsAPI = async (
+  endpoint: string
+): Promise<any[]> => {
+  const url = APIRoutes.GetPlaygroundTeams(endpoint)
+  try {
+    const response = await fetch(url, { method: 'GET' })
+    if (!response.ok) {
+      toast.error(`Failed to fetch playground teams: ${response.statusText}`)
+      return []
+    }
+    const data = await response.json()
+    return data
+  } catch {
+    toast.error('Error fetching playground teams')
+    return []
+  }
+}
+
+export const getPlaygroundWorkflowsAPI = async (
+  endpoint: string
+): Promise<any[]> => {
+  const url = APIRoutes.GetPlaygroundWorkflows(endpoint)
+  try {
+    const response = await fetch(url, { method: 'GET' })
+    if (!response.ok) {
+      toast.error(`Failed to fetch playground workflows: ${response.statusText}`)
+      return []
+    }
+    const data = await response.json()
+    return data
+  } catch {
+    toast.error('Error fetching playground workflows')
+    return []
+  }
+}
+
 export const getPlaygroundStatusAPI = async (base: string): Promise<number> => {
   const response = await fetch(APIRoutes.PlaygroundStatus(base), {
     method: 'GET'

@@ -1,0 +1,40 @@
+Prompt Template: Frontend Application Development
+I need to develop a frontend application with the following specifications:
+Pages Required:
+ [List key pages and their primary functionality]
+User Roles and Permissions:
+ [Define who can do what in the system]
+Shared Components:
+Navigation System – [Describe navigation approach: Sidebar, Top nav, etc.]
+
+
+Header/Top Bar – [Describe common elements: user info, theme toggle, etc.]
+
+
+Breadcrumbs – (If needed for hierarchical navigation)
+
+
+Modals/Popups:
+ [List main interactive elements that appear as overlays]
+Technical Requirements:
+Use [Specify CSS Framework] for styling
+
+
+Focus on component reusability
+
+
+Implement URL-based routing for all pages
+
+
+Create proper hooks and services for API data handling
+
+
+Develop a mock API store with realistic data structure (including IDs)
+
+
+Ensure the application is fully functional end-to-end
+
+
+Additional Considerations:
+ [Any specific technical or UX requirements]
+Please develop this application with clean, maintainable code and intuitive user experience.

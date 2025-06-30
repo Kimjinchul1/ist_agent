@@ -15,6 +15,23 @@ interface Agent {
   storage?: boolean
 }
 
+interface Team {
+  team_id: string
+  name: string
+  description?: string
+  model?: {
+    provider: string
+  }
+  storage?: boolean
+}
+
+interface Workflow {
+  workflow_id: string
+  name: string
+  description?: string
+  storage?: boolean
+}
+
 interface PlaygroundStore {
   hydrated: boolean
   setHydrated: () => void
@@ -49,6 +66,10 @@ interface PlaygroundStore {
   setSelectedEndpoint: (selectedEndpoint: string) => void
   agents: Agent[]
   setAgents: (agents: Agent[]) => void
+  teams: Team[]
+  setTeams: (teams: Team[]) => void
+  workflows: Workflow[]
+  setWorkflows: (workflows: Workflow[]) => void
   selectedModel: string
   setSelectedModel: (model: string) => void
   sessionsData: SessionEntry[] | null
@@ -93,6 +114,10 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
         set(() => ({ selectedEndpoint })),
       agents: [],
       setAgents: (agents) => set({ agents }),
+      teams: [],
+      setTeams: (teams) => set({ teams }),
+      workflows: [],
+      setWorkflows: (workflows) => set({ workflows }),
       selectedModel: '',
       setSelectedModel: (selectedModel) => set(() => ({ selectedModel })),
       sessionsData: null,

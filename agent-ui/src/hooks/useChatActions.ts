@@ -6,7 +6,9 @@ import { usePlaygroundStore } from '../store'
 import { ComboboxAgent, type PlaygroundChatMessage } from '@/types/playground'
 import {
   getPlaygroundAgentsAPI,
-  getPlaygroundStatusAPI
+  getPlaygroundStatusAPI,
+  getPlaygroundTeamsAPI,
+  getPlaygroundWorkflowsAPI
 } from '@/api/playground'
 import { useQueryState } from 'nuqs'
 
@@ -22,8 +24,12 @@ const useChatActions = () => {
     (state) => state.setIsEndpointLoading
   )
   const setAgents = usePlaygroundStore((state) => state.setAgents)
+  const setTeams = usePlaygroundStore((state) => state.setTeams)
+  const setWorkflows = usePlaygroundStore((state) => state.setWorkflows)
   const setSelectedModel = usePlaygroundStore((state) => state.setSelectedModel)
   const [agentId, setAgentId] = useQueryState('agent')
+  const [teamId] = useQueryState('team')
+  const [workflowId] = useQueryState('workflow')
 
   const getStatus = useCallback(async () => {
     try {
@@ -40,6 +46,26 @@ const useChatActions = () => {
       return agents
     } catch {
       toast.error('Error fetching agents')
+      return []
+    }
+  }, [selectedEndpoint])
+
+  const getTeams = useCallback(async () => {
+    try {
+      const teams = await getPlaygroundTeamsAPI(selectedEndpoint)
+      return teams
+    } catch {
+      toast.error('Error fetching teams')
+      return []
+    }
+  }, [selectedEndpoint])
+
+  const getWorkflows = useCallback(async () => {
+    try {
+      const workflows = await getPlaygroundWorkflowsAPI(selectedEndpoint)
+      return workflows
+    } catch {
+      toast.error('Error fetching workflows')
       return []
     }
   }, [selectedEndpoint])
@@ -69,10 +95,23 @@ const useChatActions = () => {
     try {
       const status = await getStatus()
       let agents: ComboboxAgent[] = []
+      let teams: any[] = []
+      let workflows: any[] = []
+      
       if (status === 200) {
         setIsEndpointActive(true)
-        agents = await getAgents()
-        if (agents.length > 0 && !agentId) {
+        // Fetch all data in parallel
+        const [agentsData, teamsData, workflowsData] = await Promise.all([
+          getAgents(),
+          getTeams(),
+          getWorkflows()
+        ])
+        
+        agents = agentsData
+        teams = teamsData
+        workflows = workflowsData
+        
+        if (agents.length > 0 && !agentId && !teamId && !workflowId) {
           const firstAgent = agents[0]
           setAgentId(firstAgent.value)
           setSelectedModel(firstAgent.model.provider || '')
@@ -80,8 +119,12 @@ const useChatActions = () => {
       } else {
         setIsEndpointActive(false)
       }
+      
       setAgents(agents)
-      return agents
+      setTeams(teams)
+      setWorkflows(workflows)
+      
+      return { agents, teams, workflows }
     } catch {
       setIsEndpointLoading(false)
     } finally {
@@ -90,18 +133,26 @@ const useChatActions = () => {
   }, [
     getStatus,
     getAgents,
+    getTeams,
+    getWorkflows,
     setIsEndpointActive,
     setIsEndpointLoading,
     setAgents,
+    setTeams,
+    setWorkflows,
     setAgentId,
     setSelectedModel,
-    agentId
+    agentId,
+    teamId,
+    workflowId
   ])
 
   return {
     clearChat,
     addMessage,
     getAgents,
+    getTeams,
+    getWorkflows,
     focusChatInput,
     initializePlayground
   }

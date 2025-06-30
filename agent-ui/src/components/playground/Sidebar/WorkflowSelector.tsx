@@ -14,75 +14,71 @@ import Icon from '@/components/ui/icon'
 import { useEffect } from 'react'
 import useChatActions from '@/hooks/useChatActions'
 
-export function AgentSelector() {
-  const { agents, setMessages, setSelectedModel, setHasStorage } =
-    usePlaygroundStore()
+export function WorkflowSelector() {
+  const { workflows, setMessages, setHasStorage } = usePlaygroundStore()
   const { focusChatInput } = useChatActions()
-  const [agentId, setAgentId] = useQueryState('agent', {
+  const [workflowId, setWorkflowId] = useQueryState('workflow', {
     parse: (value) => value || undefined,
     history: 'push'
   })
   const [, setSessionId] = useQueryState('session')
 
-  // Set the model when the component mounts if an agent is already selected
+  // Set the storage when the component mounts if a workflow is already selected
   useEffect(() => {
-    if (agentId && agents.length > 0) {
-      const agent = agents.find((agent) => agent.value === agentId)
-      if (agent) {
-        setSelectedModel(agent.model.provider || '')
-        setHasStorage(!!agent.storage)
-        if (agent.model.provider) {
-          focusChatInput()
-        }
+    if (workflowId && workflows.length > 0) {
+      const workflow = workflows.find((workflow) => workflow.workflow_id === workflowId)
+      if (workflow) {
+        setHasStorage(!!workflow.storage)
+        focusChatInput()
       } else {
-        setAgentId(agents[0].value)
+        setWorkflowId(workflows[0].workflow_id)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [agentId, agents, setSelectedModel])
+  }, [workflowId, workflows])
 
   const handleOnValueChange = (value: string) => {
-    const selectedAgent = agents.find((agent) => agent.value === value)
-    setSelectedModel(selectedAgent?.model.provider || '')
-    setHasStorage(!!selectedAgent?.storage)
-    setAgentId(value)
+    const newWorkflow = value === workflowId ? '' : value
+    const selectedWorkflow = workflows.find((workflow) => workflow.workflow_id === newWorkflow)
+    setHasStorage(!!selectedWorkflow?.storage)
+    setWorkflowId(newWorkflow)
     setMessages([])
     setSessionId(null)
-    if (selectedAgent?.model.provider) {
+    if (selectedWorkflow) {
       focusChatInput()
     }
   }
 
   return (
     <Select
-      value={agentId || ''}
+      value={workflowId || ''}
       onValueChange={(value) => handleOnValueChange(value)}
     >
       <SelectTrigger className="h-9 w-full rounded-xl border border-primary/15 bg-primaryAccent text-xs font-medium uppercase">
-        <SelectValue placeholder="Select Agent" />
+        <SelectValue placeholder="Select Workflow" />
       </SelectTrigger>
       <SelectContent className="border-none bg-primaryAccent font-dmmono shadow-lg">
-        {agents.map((agent, index) => (
+        {workflows.map((workflow, index) => (
           <SelectItem
             className="cursor-pointer"
-            key={`${agent.value}-${index}`}
-            value={agent.value}
+            key={`${workflow.workflow_id}-${index}`}
+            value={workflow.workflow_id}
           >
             <div className="flex items-center gap-3 text-xs font-medium uppercase">
-              <Icon type={'agent'} size="xs" />
-              {agent.label}
+              <Icon type={'workflow'} size="xs" />
+              {workflow.name}
             </div>
           </SelectItem>
         ))}
-        {agents.length === 0 && (
+        {workflows.length === 0 && (
           <SelectItem
-            value="no-agents"
+            value="no-workflows"
             className="cursor-not-allowed select-none text-center"
           >
-            No agents found
+            No workflows found
           </SelectItem>
         )}
       </SelectContent>
     </Select>
   )
-}
+} 

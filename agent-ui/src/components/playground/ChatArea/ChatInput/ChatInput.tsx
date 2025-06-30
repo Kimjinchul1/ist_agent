@@ -13,8 +13,13 @@ const ChatInput = () => {
 
   const { handleStreamResponse } = useAIChatStreamHandler()
   const [selectedAgent] = useQueryState('agent')
+  const [selectedTeam] = useQueryState('team')
+  const [selectedWorkflow] = useQueryState('workflow')
   const [inputMessage, setInputMessage] = useState('')
   const isStreaming = usePlaygroundStore((state) => state.isStreaming)
+
+  const hasSelectedEntity = selectedAgent || selectedTeam || selectedWorkflow
+
   const handleSubmit = async () => {
     if (!inputMessage.trim()) return
 
@@ -32,10 +37,17 @@ const ChatInput = () => {
     }
   }
 
+  const getPlaceholder = () => {
+    if (selectedAgent) return 'Ask the agent anything'
+    if (selectedTeam) return 'Ask the team anything'
+    if (selectedWorkflow) return 'Start the workflow'
+    return 'Select an agent, team, or workflow first'
+  }
+
   return (
     <div className="relative mx-auto mb-1 flex w-full max-w-2xl items-end justify-center gap-x-2 font-geist">
       <TextArea
-        placeholder={'Ask anything'}
+        placeholder={getPlaceholder()}
         value={inputMessage}
         onChange={(e) => setInputMessage(e.target.value)}
         onKeyDown={(e) => {
@@ -50,12 +62,12 @@ const ChatInput = () => {
           }
         }}
         className="w-full border border-accent bg-primaryAccent px-4 text-sm text-primary focus:border-accent"
-        disabled={!selectedAgent}
+        disabled={!hasSelectedEntity}
         ref={chatInputRef}
       />
       <Button
         onClick={handleSubmit}
-        disabled={!selectedAgent || !inputMessage.trim() || isStreaming}
+        disabled={!hasSelectedEntity || !inputMessage.trim() || isStreaming}
         size="icon"
         className="rounded-xl bg-primary p-5 text-primaryAccent"
       >
