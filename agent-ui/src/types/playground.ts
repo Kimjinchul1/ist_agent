@@ -89,6 +89,19 @@ export enum RunEvent {
   ReasoningCompleted = 'ReasoningCompleted'
 }
 
+// Team API Events
+export enum TeamRunEvent {
+  TeamRunStarted = 'TeamRunStarted',
+  TeamRunResponseContent = 'TeamRunResponseContent',
+  TeamRunCompleted = 'TeamRunCompleted',
+  TeamRunError = 'TeamRunError',
+  TeamToolCallStarted = 'TeamToolCallStarted',
+  TeamToolCallCompleted = 'TeamToolCallCompleted',
+  TeamReasoningStarted = 'TeamReasoningStarted',
+  TeamReasoningStep = 'TeamReasoningStep',
+  TeamReasoningCompleted = 'TeamReasoningCompleted'
+}
+
 export interface ResponseAudio {
   id?: string
   content?: string

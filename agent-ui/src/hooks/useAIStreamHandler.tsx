@@ -6,6 +6,7 @@ import useChatActions from '@/hooks/useChatActions'
 import { usePlaygroundStore } from '../store'
 import {
   RunEvent,
+  TeamRunEvent,
   RunResponseContent,
   type RunResponse
 } from '@/types/playground'
@@ -107,9 +108,51 @@ const useAIChatStreamHandler = () => {
     [processToolCall]
   )
 
+  /**
+   * Maps Team API events to Agent API events for consistent processing
+   */
+  const normalizeEvent = useCallback((event: string) => {
+    switch (event) {
+      case TeamRunEvent.TeamRunStarted:
+        return RunEvent.RunStarted
+      case TeamRunEvent.TeamRunResponseContent:
+        return RunEvent.RunResponseContent
+      case TeamRunEvent.TeamRunCompleted:
+        return RunEvent.RunCompleted
+      case TeamRunEvent.TeamRunError:
+        return RunEvent.RunError
+      case TeamRunEvent.TeamToolCallStarted:
+        return RunEvent.ToolCallStarted
+      case TeamRunEvent.TeamToolCallCompleted:
+        return RunEvent.ToolCallCompleted
+      case TeamRunEvent.TeamReasoningStarted:
+        return RunEvent.ReasoningStarted
+      case TeamRunEvent.TeamReasoningStep:
+        return RunEvent.ReasoningStep
+      case TeamRunEvent.TeamReasoningCompleted:
+        return RunEvent.ReasoningCompleted
+      default:
+        return event as RunEvent
+    }
+  }, [])
+
   const getApiUrl = useCallback(() => {
     const endpointUrl = constructEndpointUrl(selectedEndpoint)
     
+    // URL의 현재 탭 상태를 확인하여 올바른 API를 선택
+    const urlParams = new URLSearchParams(window.location.search)
+    const isTeamsTab = urlParams.has('team') || window.location.search.includes('teams=true')
+    const isWorkflowsTab = urlParams.has('workflow') || window.location.search.includes('workflows=true')
+    
+    // 현재 탭에 따라 우선순위 결정
+    if (isTeamsTab && teamId) {
+      return APIRoutes.TeamRun(endpointUrl).replace('{team_id}', teamId)
+    }
+    if (isWorkflowsTab && workflowId) {
+      return APIRoutes.WorkflowRun(endpointUrl).replace('{workflow_id}', workflowId)
+    }
+    
+    // 기존 로직 (agentId 우선)
     if (agentId) {
       return APIRoutes.AgentRun(endpointUrl).replace('{agent_id}', agentId)
     }
@@ -152,7 +195,8 @@ const useAIChatStreamHandler = () => {
               onChunk: (chunk: RunResponse) => {
                 // Handle workflow response chunks
                 // Similar logic to agent handling but adapted for workflow events
-                if (chunk.event === RunEvent.RunStarted) {
+                const normalizedEvent = normalizeEvent(chunk.event)
+                if (normalizedEvent === RunEvent.RunStarted) {
                   newSessionId = chunk.session_id as string
                   setSessionId(chunk.session_id as string)
                 }
@@ -222,9 +266,12 @@ const useAIChatStreamHandler = () => {
           apiUrl,
           requestBody: formData,
           onChunk: (chunk: RunResponse) => {
+            // Normalize Team events to Agent events for consistent processing
+            const normalizedEvent = normalizeEvent(chunk.event)
+            
             if (
-              chunk.event === RunEvent.RunStarted ||
-              chunk.event === RunEvent.ReasoningStarted
+              normalizedEvent === RunEvent.RunStarted ||
+              normalizedEvent === RunEvent.ReasoningStarted
             ) {
               newSessionId = chunk.session_id as string
               setSessionId(chunk.session_id as string)
@@ -248,7 +295,12 @@ const useAIChatStreamHandler = () => {
                   return [sessionData, ...(prevSessionsData ?? [])]
                 })
               }
-            } else if (chunk.event === RunEvent.ToolCallStarted) {
+            }
+            
+            if (
+              normalizedEvent === RunEvent.ToolCallStarted ||
+              normalizedEvent === RunEvent.ToolCallCompleted
+            ) {
               setMessages((prevMessages) => {
                 const newMessages = [...prevMessages]
                 const lastMessage = newMessages[newMessages.length - 1]
@@ -261,8 +313,8 @@ const useAIChatStreamHandler = () => {
                 return newMessages
               })
             } else if (
-              chunk.event === RunEvent.RunResponse ||
-              chunk.event === RunEvent.RunResponseContent
+              normalizedEvent === RunEvent.RunResponse ||
+              normalizedEvent === RunEvent.RunResponseContent
             ) {
               setMessages((prevMessages) => {
                 const newMessages = [...prevMessages]
@@ -329,7 +381,10 @@ const useAIChatStreamHandler = () => {
                 }
                 return newMessages
               })
-            } else if (chunk.event === RunEvent.ReasoningCompleted) {
+            } else if (
+              normalizedEvent === RunEvent.ReasoningStep ||
+              normalizedEvent === RunEvent.ReasoningCompleted
+            ) {
               setMessages((prevMessages) => {
                 const newMessages = [...prevMessages]
                 const lastMessage = newMessages[newMessages.length - 1]
@@ -343,7 +398,7 @@ const useAIChatStreamHandler = () => {
                 }
                 return newMessages
               })
-            } else if (chunk.event === RunEvent.RunError) {
+            } else if (normalizedEvent === RunEvent.RunError) {
               updateMessagesWithErrorState()
               const errorContent = chunk.content as string
               setStreamingErrorMessage(errorContent)
@@ -355,7 +410,7 @@ const useAIChatStreamHandler = () => {
                     ) ?? null
                 )
               }
-            } else if (chunk.event === RunEvent.RunCompleted) {
+            } else if (normalizedEvent === RunEvent.RunCompleted) {
               setMessages((prevMessages) => {
                 const newMessages = prevMessages.map((message, index) => {
                   if (
@@ -448,7 +503,8 @@ const useAIChatStreamHandler = () => {
       sessionId,
       setSessionId,
       hasStorage,
-      processChunkToolCalls
+      processChunkToolCalls,
+      normalizeEvent
     ]
   )
 

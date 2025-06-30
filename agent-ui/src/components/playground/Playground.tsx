@@ -43,31 +43,22 @@ export function Playground() {
   const [workflowId, setWorkflowId] = useQueryState('workflow')
   const [, setSessionId] = useQueryState('session')
   const userClickedTab = useRef(false)
+  const isInitialRender = useRef(true)
 
   // URL 파라미터에 따라 적절한 탭 선택
   useEffect(() => {
-    // 사용자가 직접 탭을 클릭한 경우는 무시 (약간의 지연을 두고 리셋)
+    // 초기 렌더링인 경우만 처리하여 무한 루프 방지
+    if (!isInitialRender.current) {
+      return
+    }
+    
+    // 사용자가 직접 탭을 클릭한 경우는 무시
     if (userClickedTab.current) {
-      setTimeout(() => {
-        userClickedTab.current = false
-      }, 100)
+      userClickedTab.current = false
       return
     }
 
-    // 복수 파라미터가 있는 경우 우선순위에 따라 하나만 남기고 정리
-    if (teamId && agentId) {
-      setActiveTab('teams')
-      setAgentId(null)
-      return
-    }
-    if (workflowId && (agentId || teamId)) {
-      setActiveTab('workflows')
-      if (agentId) setAgentId(null)
-      if (teamId) setTeamId(null)
-      return
-    }
-
-    // 단일 파라미터인 경우 해당 탭 선택
+    // URL 파라미터에 따라 탭 결정
     if (teamId && !agentId && !workflowId) {
       setActiveTab('teams')
     } else if (workflowId && !agentId && !teamId) {
@@ -75,6 +66,8 @@ export function Playground() {
     } else if (agentId && !teamId && !workflowId) {
       setActiveTab('agents')
     }
+    
+    isInitialRender.current = false
   }, [agentId, teamId, workflowId])
 
   const handleRefresh = async () => {
@@ -93,23 +86,21 @@ export function Playground() {
     setSessionsData([])
     setSessionId(null)
     
-    // 다른 파라미터들 batch로 정리 (상태 변경을 한번에 처리)
-    requestAnimationFrame(() => {
-      switch (tab) {
-        case 'agents':
-          if (teamId) setTeamId(null)
-          if (workflowId) setWorkflowId(null)
-          break
-        case 'teams':
-          if (agentId) setAgentId(null)
-          if (workflowId) setWorkflowId(null)
-          break
-        case 'workflows':
-          if (agentId) setAgentId(null)
-          if (teamId) setTeamId(null)
-          break
-      }
-    })
+    // 다른 파라미터들 즉시 정리 (setTimeout 제거)
+    switch (tab) {
+      case 'agents':
+        if (teamId) setTeamId(null)
+        if (workflowId) setWorkflowId(null)
+        break
+      case 'teams':
+        if (agentId) setAgentId(null)
+        if (workflowId) setWorkflowId(null)
+        break
+      case 'workflows':
+        if (agentId) setAgentId(null)
+        if (teamId) setTeamId(null)
+        break
+    }
   }
 
   const renderSelector = () => {

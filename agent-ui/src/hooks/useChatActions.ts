@@ -129,17 +129,7 @@ const useChatActions = () => {
       setIsEndpointLoading(false)
     }
   }, [
-    getStatus,
-    getAgents,
-    getTeams,
-    getWorkflows,
-    setIsEndpointActive,
-    setIsEndpointLoading,
-    setAgents,
-    setTeams,
-    setWorkflows,
-    setAgentId,
-    setSelectedModel,
+    selectedEndpoint,
     agentId
   ])
 

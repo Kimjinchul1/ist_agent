@@ -11,7 +11,7 @@ import {
 import { usePlaygroundStore } from '@/store'
 import { useQueryState } from 'nuqs'
 import Icon from '@/components/ui/icon'
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import useChatActions from '@/hooks/useChatActions'
 
 export function TeamSelector() {
@@ -34,14 +34,13 @@ export function TeamSelector() {
         if (team.model?.provider) {
           focusChatInput()
         }
-      } else {
+      } else if (teams.length > 0) {
         setTeamId(teams[0].team_id)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId, teams, setSelectedModel])
+  }, [teamId, teams])
 
-  const handleOnValueChange = (value: string) => {
+  const handleOnValueChange = useCallback((value: string) => {
     const newTeam = value === teamId ? '' : value
     const selectedTeam = teams.find((team) => team.team_id === newTeam)
     setSelectedModel(selectedTeam?.model?.provider || '')
@@ -52,12 +51,12 @@ export function TeamSelector() {
     if (selectedTeam?.model?.provider) {
       focusChatInput()
     }
-  }
+  }, [teamId, teams, setSelectedModel, setHasStorage, setTeamId, setMessages, setSessionId, focusChatInput])
 
   return (
     <Select
       value={teamId || ''}
-      onValueChange={(value) => handleOnValueChange(value)}
+      onValueChange={handleOnValueChange}
     >
       <SelectTrigger className="h-9 w-full rounded-xl border border-primary/15 bg-primaryAccent text-xs font-medium uppercase">
         <SelectValue placeholder="Select Team" />
