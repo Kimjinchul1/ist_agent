@@ -176,3 +176,56 @@ export const deletePlaygroundTeamSessionAPI = async (
   )
   return response
 }
+
+// Workflow 세션 관련 API 함수들 추가
+export const getAllPlaygroundWorkflowSessionsAPI = async (
+  base: string,
+  workflowId: string
+): Promise<SessionEntry[]> => {
+  try {
+    const response = await fetch(
+      APIRoutes.GetPlaygroundWorkflowSessions(base, workflowId),
+      {
+        method: 'GET'
+      }
+    )
+    if (!response.ok) {
+      if (response.status === 404) {
+        // Return empty array when storage is not enabled
+        return []
+      }
+      throw new Error(`Failed to fetch workflow sessions: ${response.statusText}`)
+    }
+    return response.json()
+  } catch {
+    return []
+  }
+}
+
+export const getPlaygroundWorkflowSessionAPI = async (
+  base: string,
+  workflowId: string,
+  sessionId: string
+) => {
+  const response = await fetch(
+    APIRoutes.GetPlaygroundWorkflowSession(base, workflowId, sessionId),
+    {
+      method: 'GET'
+    }
+  )
+  return response.json()
+}
+
+export const deletePlaygroundWorkflowSessionAPI = async (
+  base: string,
+  workflowId: string,
+  sessionId: string
+) => {
+  const response = await fetch(
+    APIRoutes.DeletePlaygroundWorkflowSession(base, workflowId, sessionId),
+    {
+      method: 'DELETE'
+    }
+  )
+  return response
+}

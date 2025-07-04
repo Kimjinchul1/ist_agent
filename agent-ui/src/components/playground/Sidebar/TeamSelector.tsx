@@ -23,35 +23,48 @@ export function TeamSelector() {
     history: 'push'
   })
   const [, setSessionId] = useQueryState('session')
+  const [, setAgentId] = useQueryState('agent')
 
   // Set the model when the component mounts if a team is already selected
   useEffect(() => {
+    console.log('TeamSelector useEffect:', { teamId, teams })
     if (teamId && teams.length > 0) {
       const team = teams.find((team) => team.team_id === teamId)
+      console.log('Found team:', team)
       if (team) {
-        setSelectedModel(team.model?.provider || '')
+        const provider = team.model?.provider || ''
+        console.log('Setting model provider:', provider)
+        setSelectedModel(provider)
         setHasStorage(!!team.storage)
-        if (team.model?.provider) {
+        if (provider) {
           focusChatInput()
         }
       } else if (teams.length > 0) {
+        console.log('Team not found, setting first team:', teams[0])
         setTeamId(teams[0].team_id)
       }
     }
-  }, [teamId, teams])
+  }, [teamId, teams, setSelectedModel, setHasStorage, setTeamId, focusChatInput])
 
   const handleOnValueChange = useCallback((value: string) => {
-    const newTeam = value === teamId ? '' : value
-    const selectedTeam = teams.find((team) => team.team_id === newTeam)
-    setSelectedModel(selectedTeam?.model?.provider || '')
-    setHasStorage(!!selectedTeam?.storage)
-    setTeamId(newTeam)
-    setMessages([])
-    setSessionId(null)
-    if (selectedTeam?.model?.provider) {
-      focusChatInput()
+    console.log('Team selection changed:', value)
+    const selectedTeam = teams.find((team) => team.team_id === value)
+    console.log('Selected team:', selectedTeam)
+    
+    if (selectedTeam) {
+      const provider = selectedTeam.model?.provider || ''
+      console.log('Setting model provider:', provider)
+      setSelectedModel(provider)
+      setHasStorage(!!selectedTeam.storage)
+      setTeamId(value)
+      setMessages([])
+      setSessionId(null)
+      setAgentId(null)
+      if (provider) {
+        focusChatInput()
+      }
     }
-  }, [teamId, teams, setSelectedModel, setHasStorage, setTeamId, setMessages, setSessionId, focusChatInput])
+  }, [teams, setSelectedModel, setHasStorage, setTeamId, setMessages, setSessionId, setAgentId, focusChatInput])
 
   return (
     <Select

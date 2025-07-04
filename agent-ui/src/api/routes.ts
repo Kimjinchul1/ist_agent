@@ -43,5 +43,21 @@ export const APIRoutes = {
     teamId: string,
     sessionId: string
   ) =>
-    `${PlaygroundApiUrl}/v1/playground/teams/${teamId}/sessions/${sessionId}`
+    `${PlaygroundApiUrl}/v1/playground/teams/${teamId}/sessions/${sessionId}`,
+  
+  // Workflow 세션 관련 엔드포인트 추가
+  GetPlaygroundWorkflowSessions: (PlaygroundApiUrl: string, workflowId: string) =>
+    `${PlaygroundApiUrl}/v1/playground/workflows/${workflowId}/sessions`,
+  GetPlaygroundWorkflowSession: (
+    PlaygroundApiUrl: string,
+    workflowId: string,
+    sessionId: string
+  ) =>
+    `${PlaygroundApiUrl}/v1/playground/workflows/${workflowId}/sessions/${sessionId}`,
+  DeletePlaygroundWorkflowSession: (
+    PlaygroundApiUrl: string,
+    workflowId: string,
+    sessionId: string
+  ) =>
+    `${PlaygroundApiUrl}/v1/playground/workflows/${workflowId}/sessions/${sessionId}`
 }

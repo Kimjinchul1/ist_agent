@@ -6,8 +6,22 @@ from agno.storage.sqlite import SqliteStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 from dotenv import load_dotenv
+from phoenix.otel import register
+import os
 
 load_dotenv()
+
+# 로컬 컬렉터 엔드포인트 설정
+os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://localhost:6006"
+
+from phoenix.otel import register
+
+tracer_provider = register(
+  project_name="default",
+  endpoint="http://localhost:6006/v1/traces",
+  auto_instrument=True
+)
+
 
 agent_storage: str = "tmp/agents.db"
 
@@ -26,6 +40,8 @@ web_agent = Agent(
     num_history_responses=5,
     # Adds markdown formatting to the messages
     markdown=True,
+    debug_mode=True
+
 )
 
 finance_agent = Agent(
@@ -38,6 +54,7 @@ finance_agent = Agent(
     add_history_to_messages=True,
     num_history_responses=5,
     markdown=True,
+    debug_mode=True
 )
 
 # Web Agent와 Finance Agent를 coordinate 모드로 묶은 팀 생성

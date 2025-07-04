@@ -119,12 +119,16 @@ const SessionBlankState = () => {
   })()
 
   return (
-    <div className="mt-1 flex items-center justify-center rounded-lg bg-background-secondary/50 pb-6 pt-4">
+    <div className="mt-1 flex items-center justify-center rounded-lg bg-background-secondary/50 p-3">
       <div className="flex flex-col items-center gap-1">
-        <HistoryBlankStateIcon />
-        <div className="flex flex-col items-center gap-2">
-          <h3 className="text-sm font-medium text-primary">No Session found</h3>
-          <p className="max-w-[210px] text-center text-sm text-muted">
+        <div className="w-8 h-8 bg-secondary-100 rounded-full flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-secondary-400">
+            <path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1V3zM2 7a1 1 0 011-1h10a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1V7zM3 10a1 1 0 00-1 1v1a1 1 0 001 1h10a1 1 0 001-1v-1a1 1 0 00-1-1H3z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <h3 className="text-xs font-medium text-primary">No Session found</h3>
+          <p className="max-w-[180px] text-center text-xs text-muted leading-tight">
             {errorMessage}
           </p>
         </div>

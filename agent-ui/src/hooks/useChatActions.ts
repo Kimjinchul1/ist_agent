@@ -28,6 +28,7 @@ const useChatActions = () => {
   const setWorkflows = usePlaygroundStore((state) => state.setWorkflows)
   const setSelectedModel = usePlaygroundStore((state) => state.setSelectedModel)
   const [agentId, setAgentId] = useQueryState('agent')
+  const [teamId, setTeamId] = useQueryState('team')
 
   const getStatus = useCallback(async () => {
     try {
@@ -109,10 +110,22 @@ const useChatActions = () => {
         teams = teamsData
         workflows = workflowsData
         
+        console.log('InitializePlayground data:', { agents, teams, workflows, agentId, teamId })
+        
+        // Auto-select first agent if no agent is selected
         if (agents.length > 0 && !agentId) {
           const firstAgent = agents[0]
+          console.log('Auto-selecting first agent:', firstAgent)
           setAgentId(firstAgent.value)
           setSelectedModel(firstAgent.model.provider || '')
+        }
+        
+        // Auto-select first team if no team is selected and no agent is selected
+        if (teams.length > 0 && !teamId && !agentId) {
+          const firstTeam = teams[0]
+          console.log('Auto-selecting first team:', firstTeam)
+          setTeamId(firstTeam.team_id)
+          setSelectedModel(firstTeam.model?.provider || '')
         }
       } else {
         setIsEndpointActive(false)
@@ -130,7 +143,20 @@ const useChatActions = () => {
     }
   }, [
     selectedEndpoint,
-    agentId
+    agentId,
+    teamId,
+    setAgentId,
+    setTeamId,
+    setSelectedModel,
+    setIsEndpointActive,
+    setIsEndpointLoading,
+    setAgents,
+    setTeams,
+    setWorkflows,
+    getStatus,
+    getAgents,
+    getTeams,
+    getWorkflows
   ])
 
   return {

@@ -4,28 +4,100 @@
 
 @layer base {
   :root {
-    --color-border-default: 255, 255, 255, 0.2;
-    --scrollbar-width: 0.1rem;
+    --scrollbar-width: 0.25rem;
+    --scrollbar-border-radius: 0.5rem;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 
   body {
-    @apply bg-background/80 text-secondary;
+    @apply bg-background text-secondary-700 font-geist;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Professional scrollbar styling */
+  ::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+    border-radius: var(--scrollbar-border-radius);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-medium;
+    border-radius: var(--scrollbar-border-radius);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-secondary-400;
+  }
+
+  /* Focus styles for accessibility */
+  :focus {
+    outline: 2px solid theme('colors.primary.500');
+    outline-offset: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Professional text selection */
+  ::selection {
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  /* Remove default button styles */
+  button {
+    @apply border-none bg-transparent p-0 m-0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    cursor: pointer;
+  }
+
+  /* Professional input styles */
+  input, textarea {
+    @apply border-border bg-background;
+    font-family: inherit;
+  }
+
+  input:focus, textarea:focus {
+    @apply border-primary-500 ring-1 ring-primary-500;
   }
 }
 
-::-webkit-scrollbar {
-  width: var(--scrollbar-width);
-}
-
-::-webkit-scrollbar-thumb {
-  --tw-border-opacity: 1;
-  @apply bg-border;
-  border-color: rgba(255, 255, 255, var(--tw-border-opacity));
-  border-radius: 9999px;
-  border-width: 1px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: transparent;
-  border-radius: 9999px;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .animate-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .professional-shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  .professional-border {
+    @apply border border-border;
+  }
+  
+  .hover-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
 }
