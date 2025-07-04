@@ -2,12 +2,17 @@
 
 import ChatInput from './ChatInput'
 import MessageArea from './MessageArea'
+
 const ChatArea = () => {
   return (
-    <main className="relative m-1.5 flex flex-grow flex-col rounded-xl bg-background">
-      <MessageArea />
-      <div className="sticky bottom-0 ml-9 px-4 pb-2">
-        <ChatInput />
+    <main className="flex flex-1 flex-col bg-background">
+      <div className="flex-1 overflow-hidden">
+        <MessageArea />
+      </div>
+      <div className="border-t border-border bg-background-secondary/50 p-4">
+        <div className="max-w-4xl mx-auto">
+          <ChatInput />
+        </div>
       </div>
     </main>
   )

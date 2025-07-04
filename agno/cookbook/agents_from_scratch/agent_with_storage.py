@@ -12,6 +12,11 @@ from agno.knowledge.url import UrlKnowledge
 from agno.models.openai import OpenAIChat
 from agno.storage.sqlite import SqliteStorage
 from agno.vectordb.lancedb import LanceDb, SearchType
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 
 # Setup paths
 cwd = Path(__file__).parent

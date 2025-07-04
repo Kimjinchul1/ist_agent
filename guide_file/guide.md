@@ -1,3 +1,13 @@
+# 전체적인 구성요소
+1. Agent Framework (Agno)
+2. Agent FrontEnd (Agent UI)
+3. Tracer (phoenix arize)
+4. mcpjam (MCP Builder)
+
+
+
+
+
 https://www.youtube.com/watch?v=U1_nzjWUpL4&t=228s
 # Agno Playground UI 훔쳐오기기
 1. browser mcp를 통해 특정 웹사이트의 구성 요소를 모두 들고오도록 하기.
@@ -36,3 +46,21 @@ https://www.youtube.com/watch?v=M-uUFLU9IFU
 
 
 Use the MCP browser to explore @https://app.agno.com/playground/agents?endpoint=demo.agnoagents.com/v1&agent=basic-agent. Break down the site's core architecture, focusing on playground section (Agent, Team, Workflow), and right side bar to control endpoint, config, session. And Pay close attention to technical patterns and hierarchy with the goal of enabling an accurate and scalable clone. And then create architecture.json to build the next.js app.
+
+
+
+
+
+##
+
+Tracer로 phoenix arize 확정
+
+
+
+
+## MCP Tool Builder 
+
+npx @mcpjam/inspector@latest
+
+
+

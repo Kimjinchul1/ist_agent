@@ -3,7 +3,9 @@ import {
   getPlaygroundSessionAPI,
   getAllPlaygroundSessionsAPI,
   getPlaygroundTeamSessionAPI,
-  getAllPlaygroundTeamSessionsAPI
+  getAllPlaygroundTeamSessionsAPI,
+  getPlaygroundWorkflowSessionAPI,
+  getAllPlaygroundWorkflowSessionsAPI
 } from '@/api/playground'
 import { usePlaygroundStore } from '../store'
 import { toast } from 'sonner'
@@ -11,20 +13,31 @@ import {
   PlaygroundChatMessage,
   ToolCall,
   ReasoningMessage,
-  ChatEntry
+  ChatEntry,
+  SessionEntry
 } from '@/types/playground'
 import { getJsonMarkdown } from '@/lib/utils'
 
 interface SessionResponse {
   session_id: string
-  agent_id: string
+  agent_id?: string
+  team_id?: string
+  workflow_id?: string
   user_id: string | null
   runs?: ChatEntry[]
-  memory: {
+  memory?: {
     runs?: ChatEntry[]
     chats?: ChatEntry[]
   }
-  agent_data: Record<string, unknown>
+  agent_data?: Record<string, unknown>
+  team_data?: {
+    runs?: ChatEntry[]
+    chats?: ChatEntry[]
+  }
+  workflow_data?: {
+    runs?: ChatEntry[]
+    chats?: ChatEntry[]
+  }
 }
 
 const useSessionLoader = () => {
@@ -36,24 +49,30 @@ const useSessionLoader = () => {
   const setSessionsData = usePlaygroundStore((state) => state.setSessionsData)
 
   const getSessions = useCallback(
-    async (agentId: string, teamId?: string) => {
-      if ((!agentId && !teamId) || !selectedEndpoint) return
+    async (agentId: string, teamId?: string, workflowId?: string) => {
+      if ((!agentId && !teamId && !workflowId) || !selectedEndpoint) return
       try {
         setIsSessionsLoading(true)
-        let sessions
-        if (teamId) {
+        let sessions: SessionEntry[] = []
+        if (workflowId) {
+          sessions = await getAllPlaygroundWorkflowSessionsAPI(
+            selectedEndpoint,
+            workflowId
+          )
+        } else if (teamId) {
           sessions = await getAllPlaygroundTeamSessionsAPI(
             selectedEndpoint,
             teamId
           )
-        } else {
+        } else if (agentId) {
           sessions = await getAllPlaygroundSessionsAPI(
             selectedEndpoint,
             agentId
           )
         }
         setSessionsData(sessions)
-      } catch {
+      } catch (error) {
+        console.error('Error loading sessions:', error)
         toast.error('Error loading sessions')
       } finally {
         setIsSessionsLoading(false)
@@ -63,31 +82,39 @@ const useSessionLoader = () => {
   )
 
   const getSession = useCallback(
-    async (sessionId: string, agentId: string, teamId?: string) => {
-      if (!sessionId || (!agentId && !teamId) || !selectedEndpoint) {
+    async (sessionId: string, agentId: string, teamId?: string, workflowId?: string) => {
+      if (!sessionId || (!agentId && !teamId && !workflowId) || !selectedEndpoint) {
         return null
       }
 
       try {
         let response
-        if (teamId) {
+        if (workflowId) {
+          response = (await getPlaygroundWorkflowSessionAPI(
+            selectedEndpoint,
+            workflowId,
+            sessionId
+          )) as SessionResponse
+        } else if (teamId) {
           response = (await getPlaygroundTeamSessionAPI(
             selectedEndpoint,
             teamId,
             sessionId
           )) as SessionResponse
-        } else {
+        } else if (agentId) {
           response = (await getPlaygroundSessionAPI(
             selectedEndpoint,
             agentId,
             sessionId
           )) as SessionResponse
+        } else {
+          return null
         }
 
-        if (response && response.memory) {
+        if (response && (response.memory || response.team_data || response.workflow_data)) {
           const sessionHistory = response.runs
             ? response.runs
-            : response.memory.runs
+            : response.memory?.runs || response.team_data?.runs || response.workflow_data?.runs
 
           if (sessionHistory && Array.isArray(sessionHistory)) {
             const messagesForPlayground = sessionHistory.flatMap((run) => {
@@ -167,7 +194,8 @@ const useSessionLoader = () => {
             return processedMessages
           }
         }
-      } catch {
+      } catch (error) {
+        console.error('getSession error:', error)
         return null
       }
     },

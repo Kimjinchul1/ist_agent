@@ -1,4 +1,10 @@
 openai
 anthropic
 yfinance
+fastapi
+uvicorn[standard]
+websockets
+requests
+python-dotenv
+agno
 

@@ -15,13 +15,15 @@ import { useEffect } from 'react'
 import useChatActions from '@/hooks/useChatActions'
 
 export function WorkflowSelector() {
-  const { workflows, setMessages, setHasStorage } = usePlaygroundStore()
+  const { workflows, setMessages, setHasStorage, setSelectedModel } = usePlaygroundStore()
   const { focusChatInput } = useChatActions()
   const [workflowId, setWorkflowId] = useQueryState('workflow', {
     parse: (value) => value || undefined,
     history: 'push'
   })
   const [, setSessionId] = useQueryState('session')
+  const [, setAgentId] = useQueryState('agent')
+  const [, setTeamId] = useQueryState('team')
 
   // Set the storage when the component mounts if a workflow is already selected
   useEffect(() => {
@@ -30,12 +32,11 @@ export function WorkflowSelector() {
       if (workflow) {
         setHasStorage(!!workflow.storage)
         focusChatInput()
-      } else {
+      } else if (workflows.length > 0) {
         setWorkflowId(workflows[0].workflow_id)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workflowId, workflows])
+  }, [workflowId, workflows, setHasStorage, setWorkflowId, focusChatInput])
 
   const handleOnValueChange = (value: string) => {
     const newWorkflow = value === workflowId ? '' : value
@@ -44,6 +45,8 @@ export function WorkflowSelector() {
     setWorkflowId(newWorkflow)
     setMessages([])
     setSessionId(null)
+    setAgentId(null)
+    setTeamId(null)
     if (selectedWorkflow) {
       focusChatInput()
     }

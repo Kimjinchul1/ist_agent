@@ -13,12 +13,21 @@ import { useQueryState } from 'nuqs'
 import { truncateText } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const ENDPOINT_PLACEHOLDER = 'NO ENDPOINT ADDED'
+const ENDPOINT_PLACEHOLDER = 'No endpoint configured'
 
 const SidebarHeader = () => (
-  <div className="flex items-center gap-2">
-    <Icon type="agno" size="xs" />
-    <span className="text-xs font-medium uppercase text-white">Agent UI</span>
+  <div className="flex items-center gap-3 p-1">
+    <div className="flex items-center justify-center w-8 h-8 rounded-lg">
+      <img 
+        src="/IST_LOGO.png" 
+        alt="Agent UI Logo" 
+        className="w-8 h-8 object-contain rounded-lg"
+      />
+    </div>
+    <div>
+      <h1 className="text-sm font-semibold text-secondary-900">Agent UI</h1>
+      <p className="text-xs text-secondary-500">Professional AI Interface</p>
+    </div>
   </div>
 )
 
@@ -32,11 +41,10 @@ const NewChatButton = ({
   <Button
     onClick={onClick}
     disabled={disabled}
-    size="lg"
-    className="h-9 w-full rounded-xl bg-primary text-xs font-medium text-background hover:bg-primary/80"
+    className="h-10 w-full rounded-lg bg-primary-600 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover-lift"
   >
-    <Icon type="plus-icon" size="xs" className="text-background" />
-    <span className="uppercase">New Chat</span>
+    <Icon type="plus-icon" size="xs" className="text-white mr-2" />
+    New Conversation
   </Button>
 )
 
@@ -68,7 +76,7 @@ const Endpoint = () => {
   }, [selectedEndpoint])
 
   const getStatusColor = (isActive: boolean) =>
-    isActive ? 'bg-positive' : 'bg-destructive'
+    isActive ? 'bg-success-500' : 'bg-destructive-500'
 
   const handleSave = async () => {
     if (!isValidUrl(endpointValue)) {
@@ -111,86 +119,91 @@ const Endpoint = () => {
   }
 
   return (
-    <div className="flex flex-col items-start gap-2">
-      <div className="text-xs font-medium uppercase text-primary">Endpoint</div>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium text-secondary-700">API Endpoint</label>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleRefresh}
+          className="h-8 w-8 p-0 hover:bg-accent-hover"
+        >
+          <motion.div
+            animate={{ rotate: isRotating ? 360 : 0 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+          >
+            <Icon type="refresh" size="xs" className="text-secondary-500" />
+          </motion.div>
+        </Button>
+      </div>
+      
       {isEditing ? (
-        <div className="flex w-full items-center gap-1">
+        <div className="flex items-center gap-2">
           <input
             type="text"
             value={endpointValue}
             onChange={(e) => setEndpointValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex h-9 w-full items-center text-ellipsis rounded-xl border border-primary/15 bg-accent p-3 text-xs font-medium text-muted"
+            className="flex-1 h-10 px-3 rounded-lg border border-border bg-background text-sm text-secondary-700 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors"
+            placeholder="Enter API endpoint URL..."
             autoFocus
           />
           <Button
-            variant="ghost"
-            size="icon"
             onClick={handleSave}
-            className="hover:cursor-pointer hover:bg-transparent"
+            size="sm"
+            className="h-10 px-3 bg-primary-600 hover:bg-primary-700 text-white"
           >
             <Icon type="save" size="xs" />
           </Button>
         </div>
       ) : (
-        <div className="flex w-full items-center gap-1">
+        <div className="flex items-center gap-2">
           <motion.div
-            className="relative flex h-9 w-full cursor-pointer items-center justify-between rounded-xl border border-primary/15 bg-accent p-3 uppercase"
+            className="flex-1 relative cursor-pointer"
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             onClick={() => setIsEditing(true)}
-            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <AnimatePresence mode="wait">
-              {isHovering ? (
-                <motion.div
-                  key="endpoint-display-hover"
-                  className="absolute inset-0 flex items-center justify-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <p className="flex items-center gap-2 whitespace-nowrap text-xs font-medium text-primary">
-                    <Icon type="edit" size="xxs" /> EDIT ENDPOINT
-                  </p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="endpoint-display"
-                  className="absolute inset-0 flex items-center justify-between px-3"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <p className="text-xs font-medium text-muted">
-                    {isMounted
-                      ? truncateText(selectedEndpoint, 21) ||
-                        ENDPOINT_PLACEHOLDER
-                      : 'http://localhost:7777'}
-                  </p>
-                  <div
-                    className={`size-2 shrink-0 rounded-full ${getStatusColor(isEndpointActive)}`}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="h-10 px-3 rounded-lg border border-border bg-background-secondary flex items-center justify-between hover:border-border-medium transition-colors">
+              <AnimatePresence mode="wait">
+                {isHovering ? (
+                  <motion.div
+                    key="hover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon type="edit" size="xs" className="text-secondary-500" />
+                    <span className="text-sm text-secondary-600">Edit endpoint</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="default"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-between w-full"
+                  >
+                    <span className="text-sm text-secondary-600 truncate">
+                      {isMounted 
+                        ? truncateText(selectedEndpoint, 28) || ENDPOINT_PLACEHOLDER
+                        : 'Loading...'
+                      }
+                    </span>
+                    <div className={`w-2 h-2 rounded-full ${getStatusColor(isEndpointActive)}`} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleRefresh}
-            className="hover:cursor-pointer hover:bg-transparent"
-          >
-            <motion.div
-              key={isRotating ? 'rotating' : 'idle'}
-              animate={{ rotate: isRotating ? 360 : 0 }}
-              transition={{ duration: 0.5, ease: 'easeInOut' }}
-            >
-              <Icon type="refresh" size="xs" />
-            </motion.div>
-          </Button>
+        </div>
+      )}
+      
+      {isEndpointActive && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-success-50 rounded-lg border border-success-200">
+          <div className="w-2 h-2 rounded-full bg-success-500" />
+          <span className="text-xs text-success-700 font-medium">Connected</span>
         </div>
       )}
     </div>
@@ -220,46 +233,58 @@ const Sidebar = () => {
 
   return (
     <motion.aside
-      className="relative flex h-screen shrink-0 grow-0 flex-col overflow-hidden px-2 py-3 font-dmmono"
-      initial={{ width: '16rem' }}
-      animate={{ width: isCollapsed ? '2.5rem' : '16rem' }}
+      className="relative flex h-screen shrink-0 flex-col bg-background-secondary border-r border-border"
+      initial={{ width: '20rem' }}
+      animate={{ width: isCollapsed ? '3rem' : '20rem' }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
-      <motion.button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute right-2 top-2 z-10 p-1"
-        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        type="button"
-        whileTap={{ scale: 0.95 }}
-      >
-        <Icon
+      <div className="p-4 border-b border-border">
+        <motion.button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute right-4 top-4 z-10 p-2 rounded-lg border border-border hover:bg-accent-hover hover:border-primary-300 transition-colors"
+          whileTap={{ scale: 0.95 }}
+        >
+                  <Icon
           type="sheet"
           size="xs"
-          className={`transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
+          className={`text-black hover:text-primary-600 transition-all ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
         />
-      </motion.button>
+        </motion.button>
+        
+        <motion.div
+          className="pr-8"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: isCollapsed ? 0 : 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          <SidebarHeader />
+        </motion.div>
+      </div>
+
       <motion.div
-        className="w-60 space-y-5"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: isCollapsed ? 0 : 1, x: isCollapsed ? -20 : 0 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        style={{
-          pointerEvents: isCollapsed ? 'none' : 'auto'
-        }}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: isCollapsed ? 0 : 1 }}
+        transition={{ duration: 0.2 }}
+        style={{ pointerEvents: isCollapsed ? 'none' : 'auto' }}
       >
-        <SidebarHeader />
         <NewChatButton
           disabled={messages.length === 0}
           onClick={handleNewChat}
         />
+        
         {isMounted && (
           <>
             <Endpoint />
             {isEndpointActive && (
-              <>
-                <Playground />
-                <Sessions />
-              </>
+              <div className="space-y-4">
+                <div className="border-t border-border pt-4">
+                  <Playground />
+                </div>
+                <div className="border-t border-border pt-4">
+                  <Sessions />
+                </div>
+              </div>
             )}
           </>
         )}

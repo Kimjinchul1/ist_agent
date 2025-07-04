@@ -23,6 +23,7 @@ export function AgentSelector() {
     history: 'push'
   })
   const [, setSessionId] = useQueryState('session')
+  const [, setTeamId] = useQueryState('team')
 
   // Set the model when the component mounts if an agent is already selected
   useEffect(() => {
@@ -49,6 +50,7 @@ export function AgentSelector() {
     setAgentId(newAgent)
     setMessages([])
     setSessionId(null)
+    setTeamId(null)
     if (selectedAgent?.model.provider) {
       focusChatInput()
     }

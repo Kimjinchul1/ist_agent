@@ -28,7 +28,7 @@ const SkeletonList: FC<SkeletonListProps> = ({ skeletonCount }) => {
     <Skeleton
       key={skeleton}
       className={cn(
-        'mb-1 h-11 rounded-lg px-3 py-2',
+        'mb-1 h-8 rounded-lg px-2 py-1',
         index > 0 && 'bg-background-secondary'
       )}
     />
@@ -53,6 +53,10 @@ const Sessions = () => {
     history: 'push'
   })
   const [teamId] = useQueryState('team', {
+    parse: (value) => value || undefined,
+    history: 'push'
+  })
+  const [workflowId] = useQueryState('workflow', {
     parse: (value) => value || undefined,
     history: 'push'
   })
@@ -98,15 +102,16 @@ const Sessions = () => {
   // Load a session on render if a session id exists in url
   useEffect(() => {
     if (sessionId && selectedEndpoint && hydrated) {
-      // teamId가 있으면 team 세션, agentId가 있으면 agent 세션
-      if (teamId) {
-        getSession(sessionId, '', teamId)
+      // workflowId가 있으면 workflow 세션, teamId가 있으면 team 세션, agentId가 있으면 agent 세션
+      if (workflowId) {
+        getSession(sessionId, '', undefined, workflowId)
+      } else if (teamId) {
+        getSession(sessionId, '', teamId, undefined)
       } else if (agentId) {
-        getSession(sessionId, agentId, undefined)
+        getSession(sessionId, agentId, undefined, undefined)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated])
+  }, [sessionId, selectedEndpoint, hydrated, workflowId, teamId, agentId, getSession])
 
   useEffect(() => {
     if (!selectedEndpoint || !hasStorage) {
@@ -115,17 +120,20 @@ const Sessions = () => {
     }
     if (!isEndpointLoading) {
       setSessionsData(() => null)
-      // teamId가 있으면 team 세션, agentId가 있으면 agent 세션
-      if (teamId) {
-        getSessions('', teamId)
+      // workflowId가 있으면 workflow 세션, teamId가 있으면 team 세션, agentId가 있으면 agent 세션
+      if (workflowId) {
+        getSessions('', undefined, workflowId)
+      } else if (teamId) {
+        getSessions('', teamId, undefined)
       } else if (agentId) {
-        getSessions(agentId, undefined)
+        getSessions(agentId, undefined, undefined)
       }
     }
   }, [
     selectedEndpoint,
     agentId,
     teamId,
+    workflowId,
     getSessions,
     isEndpointLoading,
     hasStorage,
@@ -156,17 +164,17 @@ const Sessions = () => {
   if (isSessionsLoading || isEndpointLoading)
     return (
       <div className="w-full">
-        <div className="mb-2 text-xs font-medium uppercase">Sessions</div>
-        <div className="mt-4 h-[calc(100vh-325px)] w-full overflow-y-auto">
-          <SkeletonList skeletonCount={5} />
+        <div className="mb-1 text-xs font-medium uppercase">Sessions</div>
+        <div className="mt-2 h-32 w-full overflow-y-auto">
+          <SkeletonList skeletonCount={3} />
         </div>
       </div>
     )
   return (
     <div className="w-full">
-      <div className="mb-2 w-full text-xs font-medium uppercase">Sessions</div>
+      <div className="mb-1 w-full text-xs font-medium uppercase">Sessions</div>
       <div
-        className={`h-[calc(100vh-345px)] overflow-y-auto font-geist transition-all duration-300 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:transition-opacity [&::-webkit-scrollbar]:duration-300 ${isScrolling ? '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-background [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:opacity-0' : '[&::-webkit-scrollbar]:opacity-100'}`}
+        className={`h-32 overflow-y-auto font-geist transition-all duration-300 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:transition-opacity [&::-webkit-scrollbar]:duration-300 ${isScrolling ? '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-background [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:opacity-0' : '[&::-webkit-scrollbar]:opacity-100'}`}
         onScroll={handleScroll}
         onMouseOver={() => setIsScrolling(true)}
         onMouseLeave={handleScroll}
