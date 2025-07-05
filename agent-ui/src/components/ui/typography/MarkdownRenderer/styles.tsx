@@ -123,9 +123,25 @@ const HorizontalRule = ({ className, ...props }: HorizontalRuleProps) => (
 
 const InlineCode: FC<PreparedTextProps> = ({ children }) => {
   return (
-    <code className="relative whitespace-pre-wrap rounded-sm bg-background-secondary/50 p-1">
+    <code className="relative whitespace-pre-wrap rounded-md bg-gray-100 px-2 py-1 text-sm font-mono text-gray-800 border">
       {children}
     </code>
+  )
+}
+
+const Pre: FC<PreparedTextProps> = ({ children, className, ...props }) => {
+  return (
+    <pre
+      className={cn(
+        'relative overflow-x-auto rounded-lg bg-gray-50 p-4 text-sm font-mono',
+        'border border-gray-200',
+        'max-w-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100',
+        className
+      )}
+      {...filterProps(props)}
+    >
+      {children}
+    </pre>
   )
 }
 
@@ -178,7 +194,7 @@ const Heading6 = ({ className, ...props }: HeadingProps) => (
 const Img = ({ src, alt }: ImgProps) => {
   const [error, setError] = useState(false)
 
-  if (!src) return null
+  if (!src || typeof src !== 'string') return null
 
   return (
     <div className="w-full max-w-xl">
@@ -269,6 +285,7 @@ export const components = {
   hr: HorizontalRule,
   blockquote: Blockquote,
   code: InlineCode,
+  pre: Pre,
   a: AnchorLink,
   img: Img,
   p: Paragraph,

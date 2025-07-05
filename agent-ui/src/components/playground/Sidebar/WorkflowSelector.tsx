@@ -60,7 +60,7 @@ export function WorkflowSelector() {
       <SelectTrigger className="h-9 w-full rounded-xl border border-primary/15 bg-primaryAccent text-xs font-medium uppercase">
         <SelectValue placeholder="Select Workflow" />
       </SelectTrigger>
-      <SelectContent className="border-none bg-primaryAccent font-dmmono shadow-lg">
+      <SelectContent className="border-none bg-white font-dmmono shadow-lg">
         {workflows.map((workflow, index) => (
           <SelectItem
             className="cursor-pointer"

@@ -64,7 +64,7 @@ export function AgentSelector() {
       <SelectTrigger className="h-9 w-full rounded-xl border border-primary/15 bg-primaryAccent text-xs font-medium uppercase">
         <SelectValue placeholder="Select Agent" />
       </SelectTrigger>
-      <SelectContent className="border-none bg-primaryAccent font-dmmono shadow-lg">
+      <SelectContent className="border-none bg-white font-dmmono shadow-lg">
         {agents.map((agent, index) => (
           <SelectItem
             className="cursor-pointer"
@@ -72,7 +72,7 @@ export function AgentSelector() {
             value={agent.value}
           >
             <div className="flex items-center gap-3 text-xs font-medium uppercase">
-              <Icon type={'agent'} size="xs" />
+              <Icon type={'user'} size="xs" />
               {agent.label}
             </div>
           </SelectItem>

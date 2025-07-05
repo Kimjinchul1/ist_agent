@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* KaTeX CSS for math rendering */
+@import 'katex/dist/katex.min.css';
+
+/* Highlight.js CSS for code highlighting */
+@import 'highlight.js/styles/github.css';
+
 @layer base {
   :root {
     --scrollbar-width: 0.25rem;
@@ -40,6 +46,36 @@
     @apply bg-secondary-400;
   }
 
+  /* Thin scrollbar for chat area */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  .scrollbar-track-gray-100::-webkit-scrollbar-track {
+    background: #f3f4f6;
+  }
+
+  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+  }
+
+  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
   /* Focus styles for accessibility */
   :focus {
     outline: 2px solid theme('colors.primary.500');
@@ -73,6 +109,115 @@
   input:focus, textarea:focus {
     @apply border-primary-500 ring-1 ring-primary-500;
   }
+
+  /* Custom KaTeX styling */
+  .katex {
+    font-size: 1.1em;
+    color: inherit;
+  }
+
+  .katex-display {
+    margin: 1.5em 0;
+    text-align: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  /* Custom highlight.js styling */
+  .hljs {
+    background: #f8f9fa !important;
+    color: #343a40 !important;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    border: 1px solid #e9ecef;
+  }
+
+  /* Specific hljs token styling for better readability */
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-subst {
+    color: #d73e48 !important;
+    font-weight: bold;
+  }
+
+  .hljs-string,
+  .hljs-doctag {
+    color: #22863a !important;
+  }
+
+  .hljs-number,
+  .hljs-literal {
+    color: #005cc5 !important;
+  }
+
+  .hljs-comment {
+    color: #6a737d !important;
+    font-style: italic;
+  }
+
+  .hljs-function,
+  .hljs-class,
+  .hljs-title {
+    color: #6f42c1 !important;
+    font-weight: bold;
+  }
+
+  .hljs-variable,
+  .hljs-attr {
+    color: #e36209 !important;
+  }
+
+  /* Dark mode support for highlight.js */
+  @media (prefers-color-scheme: dark) {
+    .hljs {
+      background: #1e1e1e !important;
+      color: #d4d4d4 !important;
+      border: 1px solid #333;
+    }
+
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-subst {
+      color: #569cd6 !important;
+    }
+
+    .hljs-string,
+    .hljs-doctag {
+      color: #ce9178 !important;
+    }
+
+    .hljs-number,
+    .hljs-literal {
+      color: #b5cea8 !important;
+    }
+
+    .hljs-comment {
+      color: #6a9955 !important;
+    }
+
+    .hljs-function,
+    .hljs-class,
+    .hljs-title {
+      color: #dcdcaa !important;
+    }
+
+    .hljs-variable,
+    .hljs-attr {
+      color: #9cdcfe !important;
+    }
+
+    /* Dark mode scrollbar */
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #4b5563;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+  }
 }
 
 @layer utilities {
@@ -99,5 +244,10 @@
   .hover-lift:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Smooth scrolling utility */
+  .scroll-smooth {
+    scroll-behavior: smooth;
   }
 }

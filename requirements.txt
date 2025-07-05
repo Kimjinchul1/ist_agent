@@ -6,5 +6,6 @@ uvicorn[standard]
 websockets
 requests
 python-dotenv
-agno
-
+arize-phoenix
+arize-phoenix-otel
+duckduckgo-search

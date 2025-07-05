@@ -17,11 +17,11 @@ const ENDPOINT_PLACEHOLDER = 'No endpoint configured'
 
 const SidebarHeader = () => (
   <div className="flex items-center gap-3 p-1">
-    <div className="flex items-center justify-center w-8 h-8 rounded-lg">
+    <div className="flex items-center justify-center w-10 h-10 rounded-lg">
       <img 
         src="/IST_LOGO.png" 
         alt="Agent UI Logo" 
-        className="w-8 h-8 object-contain rounded-lg"
+        className="w-10 h-10 object-contain rounded-lg"
       />
     </div>
     <div>

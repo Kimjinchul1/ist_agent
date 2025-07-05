@@ -165,13 +165,13 @@ export function Playground() {
   const getTabIcon = (tab: PlaygroundTab) => {
     switch (tab) {
       case 'agents':
-        return 'agent'
+        return 'user'
       case 'teams':
         return 'users'
       case 'workflows':
         return 'workflow'
       default:
-        return 'agent'
+        return 'user'
     }
   }
 

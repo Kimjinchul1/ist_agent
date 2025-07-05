@@ -36,6 +36,7 @@ import {
   ChevronDown,
   ChevronUp,
   Trash,
+  User,
   Users,
   Workflow,
   CloudOff
@@ -57,7 +58,7 @@ export const ICONS: IconTypeMap = {
   ollama: OllamaLogo,
   xai: XaiLogo,
   agno: AgnoIcon,
-  user: UserIcon,
+  user: User,
   agent: AgentIcon,
   sheet: SheetIcon,
   nextjs: NextjsTag,
