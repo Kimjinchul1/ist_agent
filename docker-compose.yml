@@ -1,0 +1,22 @@
+services:
+  ist-agent:
+    build: .
+    container_name: ist-agent
+    ports:
+      - "5500:3000"  # 프론트엔드 (컨테이너 3000 -> 호스트 5500)
+      - "6006:6006"  # Phoenix 서버
+      - "7777:7777"  # 백엔드 API
+    environment:
+      - NODE_ENV=production
+      - PYTHONUNBUFFERED=1
+      - PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006
+    volumes:
+      - ./tmp:/app/tmp  # 데이터베이스 영속성을 위한 볼륨
+      - ./.env:/app/.env  # 환경 변수 파일 (있는 경우)
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s 

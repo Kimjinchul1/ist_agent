@@ -1,7 +1,6 @@
-# Environment
-.env
-.env.local
-.env.*.local
+# Git
+.git
+.gitignore
 
 # Virtual environments
 .venv
@@ -36,14 +35,29 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment
+.env.local
+.env.*.local
 
 # Build artifacts
 build/
 dist/
 
-# Docker volumes
-tmp/
+# Documentation
+*.md
+README.md
+LICENSE
+
+# Scripts
+get-docker.sh
+run.sh
+
+# Test files
+*test.py
+*_test.py
+test_* 
