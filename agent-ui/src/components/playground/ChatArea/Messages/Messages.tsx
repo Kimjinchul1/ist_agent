@@ -1,18 +1,16 @@
 import type { PlaygroundChatMessage } from '@/types/playground'
 
 import { AgentMessage, UserMessage } from './MessageItem'
-import Tooltip from '@/components/ui/tooltip'
 import { memo } from 'react'
 import {
   ToolCallProps,
-  ReasoningStepProps,
-  ReasoningProps,
   ReferenceData,
   Reference
 } from '@/types/playground'
 import React, { type FC } from 'react'
 import ChatBlankState from './ChatBlankState'
 import Icon from '@/components/ui/icon'
+import CollapsibleReasoning from './CollapsibleReasoning'
 
 interface MessageListProps {
   messages: PlaygroundChatMessage[]
@@ -73,7 +71,7 @@ const AgentMessageWrapper = ({ message }: MessageWrapperProps) => {
                   <h4 className="text-sm font-semibold text-blue-900">Reasoning Process</h4>
                   <div className="h-px flex-1 bg-blue-200" />
                 </div>
-                <Reasonings reasoning={message.extra_data.reasoning_steps} />
+                <CollapsibleReasoning reasoning={message.extra_data.reasoning_steps} />
               </div>
             </div>
           </div>
@@ -126,26 +124,7 @@ const AgentMessageWrapper = ({ message }: MessageWrapperProps) => {
   )
 }
 
-const Reasoning: FC<ReasoningStepProps> = ({ index, stepTitle }) => (
-  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-200">
-    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white">
-      <span className="text-xs font-medium">{index + 1}</span>
-    </div>
-    <p className="text-sm text-blue-800">{stepTitle}</p>
-  </div>
-)
 
-const Reasonings: FC<ReasoningProps> = ({ reasoning }) => (
-  <div className="space-y-2">
-    {reasoning.map((title, index) => (
-      <Reasoning
-        key={`${title.title}-${title.action}-${index}`}
-        stepTitle={title.title}
-        index={index}
-      />
-    ))}
-  </div>
-)
 
 const ToolComponent = memo(({ tools }: ToolCallProps) => (
   <div className="cursor-default rounded-full bg-amber-100 border border-amber-200 px-3 py-2">

@@ -7,6 +7,8 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 from dotenv import load_dotenv
 from phoenix.otel import register
+from agno.tools.reasoning import ReasoningTools
+
 import os
 
 load_dotenv()
@@ -28,7 +30,7 @@ agent_storage: str = "tmp/agents.db"
 web_agent = Agent(
     name="Web Agent",
     model=OpenAIChat(id="gpt-4o"),
-    tools=[DuckDuckGoTools()],
+    tools=[DuckDuckGoTools(), ReasoningTools(add_instructions=True)],
     instructions=["Always include sources"],
     # Store the agent sessions in a sqlite database
     storage=SqliteStorage(table_name="web_agent", db_file=agent_storage),
@@ -47,7 +49,7 @@ web_agent = Agent(
 finance_agent = Agent(
     name="Finance Agent",
     model=OpenAIChat(id="gpt-4o"),
-    tools=[YFinanceTools(stock_price=True, analyst_recommendations=True, company_info=True, company_news=True)],
+    tools=[ReasoningTools(add_instructions=True), YFinanceTools(stock_price=True, analyst_recommendations=True, company_info=True, company_news=True)],
     instructions=["Always use tables to display data"],
     storage=SqliteStorage(table_name="finance_agent", db_file=agent_storage),
     add_datetime_to_instructions=True,
